@@ -2,7 +2,9 @@
 const cursor = document.getElementById('cursor');
 const cursorFollower = document.getElementById('cursorFollower');
 
-if (cursor && cursorFollower) {
+const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+
+if (!isTouchDevice && cursor && cursorFollower) {
   let mouseX = 0, mouseY = 0;
   let followerX = 0, followerY = 0;
 
@@ -122,8 +124,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const statements = document.querySelectorAll('.statement');
   statements.forEach(el => observer.observe(el));
   
-  const financeSections = document.querySelectorAll('.finance-preview, .split-visual');
+  const financeSections = document.querySelectorAll('.finance-preview, .split-visual:not(.native-anim)');
   financeSections.forEach(el => observer.observe(el));
+
+  // Native Mobile Animations setup
+  const nativeAnims = document.querySelectorAll('.native-anim');
+  if (window.innerWidth <= 768) {
+    nativeAnims.forEach(el => nativeAnimObserver.observe(el));
+  } else {
+    // If on desktop, reset styles applied by CSS so they show normally
+    nativeAnims.forEach(el => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      el.style.transition = 'none'; // Prevents jump on initial load
+    });
+  }
+});
+
+// Native Mobile Animations Observer
+const nativeAnimObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+      nativeAnimObserver.unobserve(entry.target);
+    }
+  });
+}, {
+  threshold: 0.1,
+  rootMargin: "0px 0px -50px 0px"
 });
 
 // Lifecycle Interactive Track
@@ -138,5 +166,32 @@ lcSteps.forEach((step, index) => {
     for(let i = 0; i <= index; i++) {
       lcSteps[i].classList.add('active');
     }
+    
+    // On mobile, try to center the clicked step smoothly
+    if (window.innerWidth <= 768) {
+      step.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
   });
 });
+
+// Mobile Menu Logic
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+const mobileLinks = document.querySelectorAll('.mobile-link, .mobile-menu-cta');
+
+if (mobileMenuBtn && mobileMenuOverlay) {
+  mobileMenuBtn.addEventListener('click', () => {
+    mobileMenuBtn.classList.toggle('active');
+    mobileMenuOverlay.classList.toggle('open');
+    document.body.style.overflow = mobileMenuOverlay.classList.contains('open') ? 'hidden' : '';
+  });
+
+  mobileLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenuBtn.classList.remove('active');
+      mobileMenuOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+}
+
