@@ -54,7 +54,17 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  cursor: none; /* Custom cursor */
+}
+
+body.custom-cursor-active {
+  cursor: none;
+}
+
+body.custom-cursor-active a,
+body.custom-cursor-active button,
+body.custom-cursor-active .lc-step,
+body.custom-cursor-active .dash-row {
+  cursor: none;
 }
 
 a {
@@ -1487,6 +1497,16 @@ section {
   .nav-links { display: none; }
   .desktop-only { display: none; }
   .mobile-menu-btn { display: block; }
+  
+  /* Disable Custom Cursor on Mobile */
+  .cursor, .cursor-follower { display: none !important; }
+  body.custom-cursor-active,
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active .lc-step,
+  body.custom-cursor-active .dash-row {
+    cursor: auto !important;
+  }
   
   /* Sections & Layout */
   section { padding: 5rem 1.5rem; }

@@ -2,13 +2,22 @@
 const cursor = document.getElementById('cursor');
 const cursorFollower = document.getElementById('cursorFollower');
 
-const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-
-if (!isTouchDevice && cursor && cursorFollower) {
+if (cursor && cursorFollower) {
   let mouseX = 0, mouseY = 0;
   let followerX = 0, followerY = 0;
+  let cursorActive = false;
+
+  // Initially hide the cursor to prevent it from sitting in the corner on mobile
+  cursor.style.opacity = '0';
+  cursorFollower.style.opacity = '0';
 
   document.addEventListener('mousemove', (e) => {
+    if (!cursorActive) {
+      cursor.style.opacity = '1';
+      cursorFollower.style.opacity = '1';
+      document.body.classList.add('custom-cursor-active');
+      cursorActive = true;
+    }
     mouseX = e.clientX;
     mouseY = e.clientY;
     
